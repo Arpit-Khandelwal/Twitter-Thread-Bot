@@ -29,13 +29,16 @@ async function postTwitterThread() {
     console.log("Generating prompt for ChatGPT...");
     // Generate a new prompt for ChatGPT
     const promptResponse = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'System', content: 'Write a twitter thread on unique and underrated chatgpt hacks. Only return the tweet contents. Eliminate any pre-text and post-text. Strictly return only tweet contents parsable in js' }],
+        model: 'gpt-3.5-turbo-0301',
+        messages: [{ role: 'system', content: 'Write a twitter thread on unique and underrated chatgpt hacks. Only return the tweet contents. Eliminate any pre-text and post-text. Strictly return only tweet contents parsable in js' }],
     });
 
 
     const prompt = promptResponse['data']['choices'][0]['message']['content']
-    console.log('Received prompt from ChatGPT: ', prompt );
+    console.log('Received prompt from ChatGPT: \n', prompt );
+    const thread = prompt.text;
+
+    const finalThread = thread.match('\n[0-9]*.')
 
     // console.log("Generating thread using ChatGPT...");
     // // Generate the thread using OpenAI's GPT model
@@ -46,18 +49,18 @@ async function postTwitterThread() {
     // const thread = threadResponse['data']['choices'][0]['message']['content'].text;
     // console.log(`Received thread from ChatGPT: ${thread}`);
 
-    console.log("Splitting thread into individual tweets...");
-    // Split the thread into individual tweets
-    const tweets = thread.match(/(.|[\r\n]){1,280}/g);
+    // console.log("Splitting thread into individual tweets...");
+    // // Split the thread into individual tweets
 
-    console.log("Posting tweets as a thread...");
-    // Post the tweets as a thread
-    const firstTweet = await client.post('statuses/update', { status: tweets[0] });
-    console.log(`Tweeted: ${tweets[0]}`);
-    for (let i = 1; i < tweets.length; i++) {
-        await client.post('statuses/update', { status: tweets[i], in_reply_to_status_id: firstTweet.id_str, auto_populate_reply_metadata: true });
-        console.log(`Tweeted: ${tweets[i]}`);
-    }
+
+    // console.log("Posting tweets as a thread...");
+    // // Post the tweets as a thread
+    // const firstTweet = await client.post('statuses/update', { status: tweets[0] });
+    // console.log(`Tweeted: ${tweets[0]}`);
+    // for (let i = 1; i < tweets.length; i++) {
+    //     await client.post('statuses/update', { status: tweets[i], in_reply_to_status_id: firstTweet.id_str, auto_populate_reply_metadata: true });
+    //     console.log(`Tweeted: ${tweets[i]}`);
+    // }
     console.log("Thread posted successfully!");
 }
 
